@@ -2,8 +2,6 @@ import streamlit as st
 import openai as ai
 from PyPDF2 import PdfReader
 
-# a = st.sidebar.radio('Choose:', ('testing1','testing2'))
-
 ai.api_key = st.secrets["openai_key"]
 
 resume_text = st.text_input('Pasted resume elements')
