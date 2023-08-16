@@ -1,8 +1,12 @@
 import streamlit as st
+import os
 import openai as ai
 from PyPDF2 import PdfReader
 
-ai.api_key = st.secrets["openai_key"]
+try:
+  ai.api_key = st.secrets["openai_key"]
+except:
+  ai.api_key = os.environ["OPENAI_API_KEY"]
 
 resume_text = st.text_input('Pasted resume elements')
 
