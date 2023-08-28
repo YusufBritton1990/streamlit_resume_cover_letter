@@ -1,7 +1,12 @@
 import streamlit as st
-import os
 import openai as ai
-from PyPDF2 import PdfReader
+import base64 #used to make download link
+
+# Make Download links
+def create_download_link(val, filename,button_txt):
+    val = val.encode('utf-8')
+    b64 = base64.b64encode(val)
+    return f'<a href="data:application/octet-stream;base64,{b64.decode()}" download="{filename}.txt">{button_txt}</a>'
 
 # if running locally, make folder/file: .streamlit/secrets.toml
 ai.api_key = st.secrets["OPENAI_API_KEY"] #running on streamlit
@@ -20,8 +25,8 @@ with st.form('input_form'):
     ai_temp = st.number_input('AI Temperature (0.0-1.0) Input how creative the API can be',value=.99)
 
     # submit button
-    # submitted = st.form_submit_button("Generate Cover Letter")
-    submitted = st.form_submit_button("Generate Resume")
+    submitted = st.form_submit_button("Generate Resume and Cover Letter")
+    # submitted = st.form_submit_button("Generate Resume")
 
 if submitted:
 
@@ -68,29 +73,19 @@ if submitted:
       {"role": "user", "content" : f"The resume is: {resume_text}"},
       {"role": "user", "content" : f"The job description is: {job_desc}"}
     ]
-  )
+    )
 
-  st.markdown("""
-  Cover Letter
-  """
-  )
-
-  cover_letter_response_out = cover_letter_completion['choices'][0]['message']['content']
-  st.write(cover_letter_response_out)
-
-  st.markdown("""
-  Resume
-  """
-  )
-
+  # Outputs
   resume_response_out = resume_completion['choices'][0]['message']['content']
-  st.write(resume_response_out)
+  cover_letter_response_out = cover_letter_completion['choices'][0]['message']['content']
 
-  # Download buttons
-  # include an option to download a txt file
-  st.download_button('Download the cover_letter', cover_letter_response_out)
-  st.download_button('Download the resume', resume_response_out)
+  download_url = create_download_link(resume_response_out, 'resume','Download Resume')
+  st.markdown(download_url, unsafe_allow_html=True)
 
+  download_url = create_download_link(cover_letter_response_out, 'cover_letter','Download Cover Letter')
+  st.markdown(download_url, unsafe_allow_html=True)
 
+  # include an option to download a txt file. However, this will rerun the page in doing so
+    # st.download_button('Download the cover_letter', response_out)
 
   
